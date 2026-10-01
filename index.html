@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOKOS STORE</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f4f6f5;
+  color:#222;
+}
+
+header{
+  background:#075e54;
+  color:white;
+  padding:16px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.header{
+  max-width:1000px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:21px;
+  font-weight:bold;
+}
+
+.cartButton{
+  border:none;
+  background:white;
+  color:#075e54;
+  padding:10px 15px;
+  border-radius:20px;
+  font-weight:bold;
+}
+
+.hero{
+  background:linear-gradient(135deg,#075e54,#128c7e);
+  color:white;
+  text-align:center;
+  padding:42px 15px;
+}
+
+.hero h1{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:25px 15px;
+}
+
+.info{
+  background:#fff3cd;
+  color:#664d03;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:20px;
+  font-size:13px;
+}
+
+.search{
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:15px;
+  margin-bottom:25px;
+}
+
+h2{
+  margin-bottom:15px;
+}
+
+.countries{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:12px;
+  margin-bottom:30px;
+}
+
+.country{
+  background:white;
+  border-radius:14px;
+  padding:15px 8px;
+  text-align:center;
+  border:2px solid transparent;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+
+.country.active{
+  border-color:#25d366;
+}
+
+.flag{
+  font-size:34px;
+}
+
+.countryName{
+  font-weight:bold;
+  margin-top:7px;
+}
+
+.stock{
+  font-size:12px;
+  color:#16803c;
+  margin-top:5px;
+}
+
+.numbers{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+}
+
+.numberCard{
+  background:white;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.number{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.status{
+  color:#16803c;
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.price{
+  color:#075e54;
+  font-weight:bold;
+  font-size:20px;
+  margin-bottom:13px;
+}
+
+.buy{
+  width:100%;
+  border:none;
+  background:#25d366;
+  color:white;
+  padding:12px;
+  border-radius:9px;
+  font-weight:bold;
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  padding:30px;
+}
+
+footer{
+  background:#075e54;
+  color:white;
+  text-align:center;
+  padding:25px;
+  margin-top:30px;
+}
+
+/* KERANJANG */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:100;
+  padding:15px;
+}
+
+.modalBox{
+  background:white;
+  max-width:450px;
+  max-height:90vh;
+  overflow:auto;
+  margin:25px auto;
+  border-radius:20px;
+  padding:25px;
+}
+
+.close{
+  float:right;
+  border:none;
+  background:none;
+  font-size:30px;
+  cursor:pointer;
+}
+
+.cartItem{
+  padding:15px 0;
+  border-bottom:1px solid #eee;
+}
+
+.remove{
+  border:none;
+  background:none;
+  color:#e53935;
+  font-size:15px;
+  margin-top:6px;
+}
+
+.total{
+  font-size:21px;
+  font-weight:bold;
+  margin:20px 0;
+}
+
+.checkout{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:#25d366;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+
+    <div class="logo">
+      📱 NOKOS STORE
+    </div>
+
+    <button class="cartButton" onclick="openCart()">
+      🛒 Keranjang (<span id="cartCount">0</span>)
+    </button>
+
+  </div>
+</header>
+
+
+<section class="hero">
+
+  <h1>NOKOS STORE</h1>
+
+  <p>Pilih negara dan pilih nomor yang tersedia</p>
+
+</section>
+
+
+<div class="container">
+
+  <div class="info">
+    ⚠️ Nomor pada versi demo adalah nomor contoh.
+  </div>
+
+  <input
+    class="search"
+    id="search"
+    placeholder="🔎 Cari nomor..."
+    oninput="render()"
+  >
+
+  <h2>🌍 Pilih Negara</h2>
+
+  <div class="countries" id="countries"></div>
+
+  <h2>📱 Nomor Tersedia</h2>
+
+  <div class="numbers" id="numbers"></div>
+
+</div>
+
+
+<footer>
+
+  <b>📱 NOKOS STORE</b>
+
+  <br><br>
+
+  © 2026 Nokos Store
+
+</footer>
+
+
+<!-- MODAL KERANJANG -->
+
+<div class="modal" id="cartModal">
+
+  <div class="modalBox">
+
+    <button class="close" onclick="closeCart()">
+      ×
+    </button>
+
+    <h2>🛒 Keranjang</h2>
+
+    <br>
+
+    <div id="cartItems"></div>
+
+    <div class="total">
+      Total: <span id="total">Rp0</span>
+    </div>
+
+    <button
+      class="checkout"
+      onclick="checkout()">
+
+      💬 Pesan Sekarang
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   PENGATURAN
+========================= */
+
+const PRICE = 5000;
+
+/* Nomor WhatsApp kamu */
+const adminNumber = "6289507009127";
+
+
+/* =========================
+   NEGARA
+========================= */
+
+const countries = [
+
+  {
+    id:"indonesia",
+    name:"Indonesia",
+    flag:"🇮🇩"
+  },
+
+  {
+    id:"malaysia",
+    name:"Malaysia",
+    flag:"🇲🇾"
+  },
+
+  {
+    id:"nigeria",
+    name:"Nigeria",
+    flag:"🇳🇬"
+  },
+
+  {
+    id:"mesir",
+    name:"Mesir",
+    flag:"🇪🇬"
+  },
+
+  {
+    id:"thailand",
+    name:"Thailand",
+    flag:"🇹🇭"
+  },
+
+  {
+    id:"vietnam",
+    name:"Vietnam",
+    flag:"🇻🇳"
+  },
+
+  {
+    id:"india",
+    name:"India",
+    flag:"🇮🇳"
+  },
+
+  {
+    id:"rusia",
+    name:"Rusia",
+    flag:"🇷🇺"
+  }
+
+];
+
+
+/* =========================
+   NOMOR CONTOH
+========================= */
+
+const numbers = [
+
+  {id:1,country:"indonesia",number:"+62 813 7429 6158"},
+  {id:2,country:"indonesia",number:"+62 857 3916 4827"},
+  {id:3,country:"indonesia",number:"+62 821 6483 9572"},
+  {id:4,country:"indonesia",number:"+62 896 2741 5839"},
+  {id:5,country:"indonesia",number:"+62 838 5162 7493"},
+  {id:6,country:"indonesia",number:"+62 852 9374 1628"},
+
+  {id:7,country:"malaysia",number:"+60 11 7284 5931"},
+  {id:8,country:"malaysia",number:"+60 12 3947 6815"},
+  {id:9,country:"malaysia",number:"+60 13 6815 2749"},
+  {id:10,country:"malaysia",number:"+60 14 5293 8176"},
+  {id:11,country:"malaysia",number:"+60 16 8472 3519"},
+  {id:12,country:"malaysia",number:"+60 17 3158 6942"},
+
+  {id:13,country:"nigeria",number:"+234 803 741 9265"},
+  {id:14,country:"nigeria",number:"+234 806 293 7154"},
+  {id:15,country:"nigeria",number:"+234 807 518 4639"},
+  {id:16,country:"nigeria",number:"+234 809 674 2815"},
+  {id:17,country:"nigeria",number:"+234 810 395 8274"},
+  {id:18,country:"nigeria",number:"+234 813 826 5147"},
+
+  {id:19,country:"mesir",number:"+20 101 748 2936"},
+  {id:20,country:"mesir",number:"+20 102 395 8174"},
+  {id:21,country:"mesir",number:"+20 106 824 5319"},
+  {id:22,country:"mesir",number:"+20 109 637 2841"},
+  {id:23,country:"mesir",number:"+20 111 529 7463"},
+  {id:24,country:"mesir",number:"+20 112 863 4157"},
+
+  {id:25,country:"thailand",number:"+66 81 472 9365"},
+  {id:26,country:"thailand",number:"+66 82 693 5174"},
+  {id:27,country:"thailand",number:"+66 84 318 7529"},
+  {id:28,country:"thailand",number:"+66 89 745 2618"},
+
+  {id:29,country:"vietnam",number:"+84 91 472 6385"},
+  {id:30,country:"vietnam",number:"+84 93 815 2746"},
+  {id:31,country:"vietnam",number:"+84 97 364 8291"},
+  {id:32,country:"vietnam",number:"+84 98 527 4136"},
+
+  {id:33,country:"india",number:"+91 78364 29157"},
+  {id:34,country:"india",number:"+91 81652 74391"},
+  {id:35,country:"india",number:"+91 92741 63825"},
+  {id:36,country:"india",number:"+91 63827 51496"},
+
+  {id:37,country:"rusia",number:"+7 912 748 6395"},
+  {id:38,country:"rusia",number:"+7 916 382 7419"},
+  {id:39,country:"rusia",number:"+7 918 635 2741"},
+  {id:40,country:"rusia",number:"+7 920 471 8635"}
+
+];
+
+
+let selectedCountry = "all";
+
+let cart = [];
+
+
+/* =========================
+   FORMAT HARGA
+========================= */
+
+function rupiah(n){
+
+  return new Intl.NumberFormat(
+    "id-ID",
+    {
+      style:"currency",
+      currency:"IDR",
+      maximumFractionDigits:0
+    }
+  ).format(n);
+
+}
+
+
+/* =========================
+   TAMPILKAN NEGARA
+========================= */
+
+function renderCountries(){
+
+  const box =
+    document.getElementById("countries");
+
+  box.innerHTML = `
+
+    <div
+      class="country ${selectedCountry==="all" ? "active" : ""}"
+      onclick="selectCountry('all')">
+
+      <div class="flag">🌍</div>
+
+      <div class="countryName">
+        Semua
+      </div>
+
+      <div class="stock">
+        ${numbers.length} nomor
+      </div>
+
+    </div>
+
+  `;
+
+
+  countries.forEach(c => {
+
+    const count =
+      numbers.filter(
+        n => n.country === c.id
+      ).length;
+
+    box.innerHTML += `
+
+      <div
+        class="country ${selectedCountry===c.id ? "active" : ""}"
+        onclick="selectCountry('${c.id}')">
+
+        <div class="flag">
+          ${c.flag}
+        </div>
+
+        <div class="countryName">
+          ${c.name}
+        </div>
+
+        <div class="stock">
+          ${count} nomor
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* =========================
+   PILIH NEGARA
+========================= */
+
+function selectCountry(id){
+
+  selectedCountry = id;
+
+  render();
+
+}
+
+
+/* =========================
+   TAMPILKAN NOMOR
+========================= */
+
+function render(){
+
+  renderCountries();
+
+  const box =
+    document.getElementById("numbers");
+
+  const keyword =
+    document.getElementById("search")
+    .value
+    .toLowerCase();
+
+  const list =
+    numbers.filter(n => {
+
+      const countryMatch =
+        selectedCountry === "all" ||
+        n.country === selectedCountry;
+
+      const searchMatch =
+        n.number
+        .toLowerCase()
+        .includes(keyword);
+
+      return countryMatch && searchMatch;
+
+    });
+
+
+  if(list.length === 0){
+
+    box.innerHTML = `
+      <div class="empty">
+        Nomor tidak ditemukan.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    list.map(n => `
+
+      <div class="numberCard">
+
+        <div class="number">
+          📱 ${n.number}
+        </div>
+
+        <div class="status">
+          ● Tersedia
+        </div>
+
+        <div class="price">
+          ${rupiah(PRICE)}
+        </div>
+
+        <button
+          class="buy"
+          onclick="addCart(${n.id})">
+
+          🛒 Pilih Nomor
+
+        </button>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================
+   TAMBAH KE KERANJANG
+========================= */
+
+function addCart(id){
+
+  const item =
+    numbers.find(n => n.id === id);
+
+
+  if(cart.some(n => n.id === id)){
+
+    alert("Nomor sudah dipilih.");
+
+    return;
+  }
+
+
+  cart.push(item);
+
+  updateCart();
+
+  alert("Nomor berhasil dipilih.");
+
+}
+
+
+/* =========================
+   UPDATE KERANJANG
+========================= */
+
+function updateCart(){
+
+  document.getElementById("cartCount")
+    .textContent = cart.length;
+
+}
+
+
+/* =========================
+   BUKA KERANJANG
+========================= */
+
+function openCart(){
+
+  renderCart();
+
+  document.getElementById("cartModal")
+    .style.display = "block";
+
+}
+
+
+/* =========================
+   TUTUP KERANJANG
+========================= */
+
+function closeCart(){
+
+  document.getElementById("cartModal")
+    .style.display = "none";
+
+}
+
+
+/* =========================
+   TAMPILKAN KERANJANG
+========================= */
+
+function renderCart(){
+
+  const box =
+    document.getElementById("cartItems");
+
+
+  if(cart.length === 0){
+
+    box.innerHTML = `
+      <div class="empty">
+        Keranjang masih kosong.
+      </div>
+    `;
+
+    document.getElementById("total")
+      .textContent = "Rp0";
+
+    return;
+  }
+
+
+  box.innerHTML =
+    cart.map((n,index) => `
+
+      <div class="cartItem">
+
+        📱 <b>${n.number}</b>
+
+        <br>
+
+        Rp5.000
+
+        <br>
+
+        <button
+          class="remove"
+          onclick="removeCart(${index})">
+
+          Hapus
+
+        </button>
+
+      </div>
+
+    `).join("");
+
+
+  document.getElementById("total")
+    .textContent =
+    rupiah(cart.length * PRICE);
+
+}
+
+
+/* =========================
+   HAPUS
+========================= */
+
+function removeCart(index){
+
+  cart.splice(index,1);
+
+  updateCart();
+
+  renderCart();
+
+}
+
+
+/* =========================
+   PESAN KE WHATSAPP
+========================= */
+
+function checkout(){
+
+  if(cart.length === 0){
+
+    alert("Keranjang masih kosong.");
+
+    return;
+  }
+
+
+  let list = "";
+
+
+  cart.forEach((n,index) => {
+
+    list +=
+      `${index + 1}. ${n.number} - Rp5.000\n`;
+
+  });
+
+
+  const total =
+    cart.length * PRICE;
+
+
+  const message =
+`Halo Admin NOKOS STORE 👋
+
+Saya ingin membeli nokos.
+
+Nomor yang dipilih:
+
+${list}
+
+Total:
+${rupiah(total)}
+
+Mohon diproses. Terima kasih.`;
+
+
+  const url =
+    "https://wa.me/" +
+    adminNumber +
+    "?text=" +
+    encodeURIComponent(message);
+
+
+  window.open(url,"_blank");
+
+}
+
+
+/* =========================
+   MULAI
+========================= */
+
+render();
+
+</script>
+
+</body>
+</html>
